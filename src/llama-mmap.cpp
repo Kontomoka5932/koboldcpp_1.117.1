@@ -558,28 +558,11 @@ struct llama_mmap::impl {
         }
 
 #ifndef USE_FAILSAFE
-        if (prefetch > 0) {
-#if _WIN32_WINNT >= 0x602
-            BOOL (WINAPI *pPrefetchVirtualMemory) (HANDLE, ULONG_PTR, PWIN32_MEMORY_RANGE_ENTRY, ULONG);
-            HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll");
-
-            pPrefetchVirtualMemory = (decltype(pPrefetchVirtualMemory))(void *) GetProcAddress(hKernel32, "PrefetchVirtualMemory");
-
-            if (pPrefetchVirtualMemory) {
-                WIN32_MEMORY_RANGE_ENTRY range;
-                range.VirtualAddress = addr;
-                range.NumberOfBytes = (SIZE_T) std::min(size, prefetch);
-                if (!pPrefetchVirtualMemory(GetCurrentProcess(), 1, &range, 0)) {
-                    LLAMA_LOG_WARN("warning: PrefetchVirtualMemory failed: %s\n",
-                            llama_format_win_err(GetLastError()).c_str());
-                }
-            }
+    if (prefetch > 0) {
+        (void)0;
+    }
 #else
-            LLAMA_LOG_DEBUG("skipping PrefetchVirtualMemory because _WIN32_WINNT < 0x602\n");
-#endif
-        }
-#else
-printf("\nPrefetchVirtualMemory skipped in compatibility mode.\n");
+    printf("\nPrefetchVirtualMemory skipped in compatibility mode.\n");
 #endif
     }
 

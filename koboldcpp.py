@@ -5235,7 +5235,7 @@ class KcppServerRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             genout = run_blocking()
 
-        recvtxt = genout['text']
+        recvtxt = str(genout['text'])
         prompttokens = genout['prompt_tokens'] if genout['prompt_tokens'] > 0 else 0
         comptokens = genout['completion_tokens'] if genout['completion_tokens'] > 0 else 0
         currfinishreason = "error" if (genout['stopreason'] == -2) else ("length" if (genout['stopreason'] != 1) else "stop")

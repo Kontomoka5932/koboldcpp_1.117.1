@@ -3784,6 +3784,9 @@ def format_jinja(messages_orig, tools, chat_template_kwargs=None):
         # sanitize messages to remove none types
         messages = json.loads(json.dumps(messages_orig))
         for m in messages:
+            if m.get("content") is not None and not isinstance(m["content"], (list, str)):
+                m["content"] = str(m["content"])
+            # FIX_TYPE_3795
             if m.get("content") is None:
                 m["content"] = ""
         # fix image placeholders, erase them and slap a reference onto the turn text message
@@ -4648,6 +4651,9 @@ ws ::= | " " | "\n" [ \t]{0,20}
         # Pass 1: normalize content blocks per message; lift tool_use into tool_calls on assistant turns
         for msg in messages:
             content = msg.get("content")
+            if content is not None and not isinstance(content, (list, str)):
+                content = [content]
+            # FIX_TYPE_4658
             if not isinstance(content, list):
                 continue
             role = msg.get("role", "")
@@ -4692,6 +4698,9 @@ ws ::= | " " | "\n" [ \t]{0,20}
         for msg in messages:
             role = msg.get("role", "")
             content = msg.get("content")
+            if content is not None and not isinstance(content, (list, str)):
+                content = [content]
+            # FIX_TYPE_4682
             if role == "user" and isinstance(content, list):
                 tool_result_items = [item for item in content if isinstance(item, dict) and item.get("type") == "tool_result"]
                 other_items = [item for item in content if not (isinstance(item, dict) and item.get("type") == "tool_result")]
